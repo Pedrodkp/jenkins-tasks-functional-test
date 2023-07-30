@@ -1,5 +1,7 @@
 package com.upiara.tasks;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
@@ -7,10 +9,26 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 class AppTest {
+    Boolean SELENIUM_HUB = true;
+    String LOCAL_IP = "192.168.0.106";
+
     public WebDriver acessarApp(String url) {
-        WebDriver driver = new ChromeDriver();
+        WebDriver driver;
+        if (SELENIUM_HUB)
+            try {
+                DesiredCapabilities cap = DesiredCapabilities.chrome();
+                driver = new RemoteWebDriver(new URL("http://"+LOCAL_IP+":4444/wd/hub"), cap);
+            } catch (Exception e) {
+                return null;
+            }
+        else {
+            driver = new ChromeDriver();
+        }
+
         driver.navigate().to(url);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         return driver;
@@ -47,7 +65,7 @@ class AppTest {
 
     @Test
     void deveSalvarTarefaComSucesso() {
-        WebDriver driver = acessarApp("http://localhost:8001/tasks");
+        WebDriver driver = acessarApp("http://"+LOCAL_IP+":8001/tasks");
 
         try {
             String message = fillTaskForm(driver, "Teste via Selenium", "10/10/2030");
@@ -60,7 +78,7 @@ class AppTest {
 
     @Test
     void naoDeveSalvarTarefaSemDescricao() {
-        WebDriver driver = acessarApp("http://localhost:8001/tasks");
+        WebDriver driver = acessarApp("http://"+LOCAL_IP+":8001/tasks");
 
         try {
             String message = fillTaskForm(driver, null, "10/10/2030");
@@ -73,7 +91,7 @@ class AppTest {
 
     @Test
     void naoDeveSalvarTarefaSemData() {
-        WebDriver driver = acessarApp("http://localhost:8001/tasks");
+        WebDriver driver = acessarApp("http://"+LOCAL_IP+":8001/tasks");
 
         try {
             String message = fillTaskForm(driver, "Teste via Selenium", null);
@@ -86,7 +104,7 @@ class AppTest {
 
     @Test
     void naoDeveSalvarConDataPassada() {
-        WebDriver driver = acessarApp("http://localhost:8001/tasks");
+        WebDriver driver = acessarApp("http://"+LOCAL_IP+":8001/tasks");
 
         try {
             String message = fillTaskForm(driver, "Teste via Selenium", "10/10/2010");

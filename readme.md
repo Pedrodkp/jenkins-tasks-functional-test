@@ -1,0 +1,3 @@
+-- run multithread
+
+mvn test
