@@ -1,6 +1,5 @@
 package com.upiara.tasks;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
@@ -110,6 +109,26 @@ class AppTest {
             String message = fillTaskForm(driver, "Teste via Selenium", "10/10/2010");
             Assert.assertEquals("Due date must not be in past", message);
 
+        } finally {
+            driver.quit();
+        }
+    }
+
+    @Test
+    void deveRemoverTarefaComSucesso() {
+        WebDriver driver = acessarApp("http://"+LOCAL_IP+":8001/tasks");
+
+        try {
+            //insert task
+            String message = fillTaskForm(driver, "Teste via Selenium com Sucesso", "10/10/2030");            
+            Assert.assertEquals("Success!", message);
+
+            //remove task
+            driver.findElement(By.xpath("//a[@class='btn btn-outline-danger btn-sm']")).click();
+
+            //check msg
+            message = driver.findElement(By.id("message")).getText();
+            Assert.assertEquals("Success!", message);
         } finally {
             driver.quit();
         }
